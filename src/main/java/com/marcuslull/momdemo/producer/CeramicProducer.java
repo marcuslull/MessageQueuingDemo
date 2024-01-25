@@ -4,8 +4,6 @@ import com.marcuslull.momdemo.model.Ceramic;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +25,6 @@ public class CeramicProducer {
                 System.out.println(Thread.currentThread().getName() + " Sending ceramic...");
                 rabbitTemplate.convertAndSend("Ceramic", new Ceramic("Ceramic"));
             });
-            thread.start();
-        }, 0, interval * 1000L, TimeUnit.MILLISECONDS);
+            thread.start();}, interval * 1000L, interval * 1000L, TimeUnit.MILLISECONDS);
     }
 }
