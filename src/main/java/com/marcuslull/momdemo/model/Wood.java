@@ -1,30 +1,10 @@
 package com.marcuslull.momdemo.model;
 
-import java.io.Serializable;
-
-public class Wood implements Serializable {
-
-    private String name;
-
-    public Wood(String name) {
-        this.name = name;
-    }
-
-    public Wood() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Wood{" +
-                "name='" + name + '\'' +
-                '}';
-    }
+// Description provided by: https://bard.google.com/
+public class Wood extends Resource {
+    private final String name = "Water";
+    private final String description = "Not walls, but branches reach, arms of the forest whispering shelter. " +
+            "Fire's cradle, spear's spine, wood sings with the wind's song, whispers warmth against the night's chill. " +
+            "Each splinter, a whispered memory of sun-dappled leaves, a primitive society cradled in nature's embrace. ";
+    private int productionTime;
 }
