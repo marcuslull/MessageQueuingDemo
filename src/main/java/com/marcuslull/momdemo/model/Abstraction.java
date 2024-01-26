@@ -1,5 +1,6 @@
 package com.marcuslull.momdemo.model;
 
+import com.marcuslull.momdemo.model.controller.Simulation;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 
 // Description provided by: https://bard.google.com/

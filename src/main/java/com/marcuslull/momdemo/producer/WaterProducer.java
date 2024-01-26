@@ -1,12 +1,8 @@
 package com.marcuslull.momdemo.producer;
 
-import com.marcuslull.momdemo.model.Simulation;
 import com.marcuslull.momdemo.model.Water;
-import com.marcuslull.momdemo.model.enums.Difficulty;
-import com.marcuslull.momdemo.model.enums.Production;
-import com.marcuslull.momdemo.model.enums.Rarity;
-import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
+import com.marcuslull.momdemo.model.service.RecordService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +14,17 @@ import java.util.concurrent.TimeUnit;
 public class WaterProducer {
     private final RabbitTemplate rabbitTemplate;
     private final ScheduledExecutorService scheduledExecutorService;
-    private final Simulation simulation;
     private final ResourceRecord waterRR;
     private final Long MILLIS_PER_SECOND = 1000L;
-    private final int CORE_POOL_SIZE = 1;
-    private final Long TIMEOUT = 3L;
 
-    public WaterProducer(RabbitTemplate rabbitTemplate, Simulation simulation) {
+    public WaterProducer(RecordService recordService, RabbitTemplate rabbitTemplate) {
+        this.waterRR = recordService.getWater();
         this.rabbitTemplate = rabbitTemplate;
-        this.simulation = simulation;
-        this.scheduledExecutorService = Executors.newScheduledThreadPool(CORE_POOL_SIZE);
-        this.waterRR = new ResourceRecord("Water", TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.EASY);
+        int EXECUTOR_CORE_POOL_SIZE = 1;
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
     }
     public void autoProduce() {
-        Water water = new Water(simulation, waterRR);
+        Water water = new Water(waterRR);
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend("Water", water);
             System.out.println("Water Producer: " + Thread.currentThread().getName() + " Sending water...");
@@ -40,7 +33,7 @@ public class WaterProducer {
                 water.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
     }
     public void produce(int amount) {
-        Water water = new Water(simulation, waterRR);
+        Water water = new Water(waterRR);
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend("Water", water);
             System.out.println("Water Producer: " + Thread.currentThread().getName() + " Sending water...");
@@ -52,7 +45,8 @@ public class WaterProducer {
     public void stopProduction() {
         scheduledExecutorService.shutdown();
         try {
-            if(scheduledExecutorService.awaitTermination(TIMEOUT, TimeUnit.SECONDS)) {
+            long EXECUTOR_SHUTDOWN_TIMEOUT = 3L;
+            if(scheduledExecutorService.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS)) {
                 System.out.println("Graceful shutdown successful.");
             }
         } catch (InterruptedException e) {

@@ -9,13 +9,13 @@ public class Water extends Resource{
             "Primitive hands cup its coolness, quench thirst, whisper prayers to unseen spirits. In its flow, " +
             "a society sees its own, ever-changing, reflecting the moon's dance and the sun's kiss. ";
     private int productionTime;
-    public Water(Simulation simulation, ResourceRecord record) {
+    public Water(ResourceRecord record) {
         this.rarity = record.rarity();
         this.difficulty = record.difficulty();
         this.production = record.production();
         this.techLevel = record.techLevel();
         this.productionTime = (this.difficulty.ordinal() * this.rarity.ordinal() * this.production.ordinal() *
-                this.techLevel.ordinal()) / simulation.getCurrentTechLevel().ordinal();
+                this.techLevel.ordinal());
 
         System.out.println(this.description);
         System.out.println(this.name + " production time: " + this.productionTime);
