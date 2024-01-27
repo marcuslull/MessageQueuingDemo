@@ -18,24 +18,19 @@ public class Water extends Resource{
                 this.techLevel.ordinal());
 
         System.out.println(this.description);
-        System.out.println(this.name + " production time: " + this.productionTime);
+        System.out.println(this.name + " water production time: " + this.productionTime);
     }
-
     public Water() {
     }
-
     public String getName() {
         return name;
     }
-
     public String getDescription() {
         return description;
     }
-
     public int getProductionTime() {
         return productionTime;
     }
-
     public void setProductionTime(int productionTime) {
         this.productionTime = productionTime;
     }

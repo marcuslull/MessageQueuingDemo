@@ -18,7 +18,7 @@ public class Abstraction extends Resource {
         this.difficulty = record.difficulty();
         this.production = record.production();
         this.techLevel = record.techLevel();
-        this.productionTime = (this.difficulty.ordinal() * this.rarity.ordinal() * this.production.ordinal() *
-                this.techLevel.ordinal()) / simulation.getCurrentTechLevel().ordinal();
+//        this.productionTime = (this.difficulty.ordinal() * this.rarity.ordinal() * this.production.ordinal() *
+//                this.techLevel.ordinal()) / simulation.getCurrentTechLevel().ordinal();
     }
 }
