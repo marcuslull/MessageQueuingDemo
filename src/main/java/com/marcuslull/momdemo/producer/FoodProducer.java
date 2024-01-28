@@ -2,7 +2,7 @@ package com.marcuslull.momdemo.producer;
 
 import com.marcuslull.momdemo.model.Food;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
-import com.marcuslull.momdemo.model.service.RecordService;
+import com.marcuslull.momdemo.service.RecordService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 

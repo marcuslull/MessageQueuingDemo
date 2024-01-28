@@ -1,4 +1,4 @@
-package com.marcuslull.momdemo.model.service;
+package com.marcuslull.momdemo.service;
 
 import com.marcuslull.momdemo.model.enums.Difficulty;
 import com.marcuslull.momdemo.model.enums.Production;

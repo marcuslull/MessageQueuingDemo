@@ -1,6 +1,6 @@
 package com.marcuslull.momdemo;
 
-import com.marcuslull.momdemo.model.controller.Simulation;
+import com.marcuslull.momdemo.controller.Simulation;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

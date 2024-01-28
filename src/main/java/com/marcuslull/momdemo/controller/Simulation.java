@@ -1,4 +1,4 @@
-package com.marcuslull.momdemo.model.controller;
+package com.marcuslull.momdemo.controller;
 
 import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.producer.FoodProducer;
