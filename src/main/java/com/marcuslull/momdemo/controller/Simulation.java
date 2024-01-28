@@ -1,26 +1,29 @@
 package com.marcuslull.momdemo.controller;
 
+import com.marcuslull.momdemo.model.Resource;
 import com.marcuslull.momdemo.model.enums.TechLevel;
-import com.marcuslull.momdemo.producer.FoodProducer;
-import com.marcuslull.momdemo.producer.WaterProducer;
+import com.marcuslull.momdemo.model.records.ResourceRecord;
+import com.marcuslull.momdemo.producer.Producer;
+import com.marcuslull.momdemo.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class Simulation {
-    private WaterProducer waterProducer;
-    private FoodProducer foodProducer;
+    private RecordService recordService;
+    private Producer producer;
     private TechLevel currentTechLevel;
     public Simulation() {}
     @Autowired
-    public void setWaterProducer(WaterProducer waterProducer) { this.waterProducer = waterProducer; }
+    public void setRecordService(RecordService recordService) { this.recordService = recordService; }
     @Autowired
-    public void setFoodProducer(FoodProducer foodProducer) { this.foodProducer = foodProducer; }
+    public void setWaterProducer(Producer producer) { this.producer = producer; }
     public void start() {
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
         System.out.println("Simulation started..."); // TODO: replace with logger
-        waterProducer.autoProduce();
-        foodProducer.autoProduce();
+        ResourceRecord waterRecord = recordService.getWaterRecord();
+        Resource water = new Resource(waterRecord);
+        producer.autoProduce(water);
     }
     private void setCurrentTechLevel(TechLevel newTechLevel) {
         this.currentTechLevel = newTechLevel;

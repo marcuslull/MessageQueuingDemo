@@ -7,6 +7,7 @@ import com.marcuslull.momdemo.model.enums.TechLevel;
 
 public record ResourceRecord(
         String name,
+        String description,
         TechLevel techLevel,
         Rarity rarity,
         Production production,
