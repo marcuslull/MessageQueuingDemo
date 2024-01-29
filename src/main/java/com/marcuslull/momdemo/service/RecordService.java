@@ -7,6 +7,11 @@ import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Map.entry;
+
 
 @Service
 public class RecordService {
@@ -97,42 +102,34 @@ public class RecordService {
             "on the canvas of progress, a whispered song woven into the fabric of civilization. " +
             "From tilling soil to shaping stars, each labor adds a verse to the chorus, a testament to the human " +
             "spirit's tireless hum.";
+    private final Map<String, Integer> waterRequirements = new HashMap<>();
+    private final Map<String, Integer> foodRequirements = Map.ofEntries(entry("Water", 20));
+    private final Map<String, Integer> workRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1));
+    private final Map<String, Integer> educationRequirements = Map.ofEntries(entry("Water", 1), entry("Food", 1), entry("Work", 10));
+    private final Map<String, Integer> stoneRequirements = Map.ofEntries(entry("Water", 3), entry("Food", 1), entry("Work", 3));
+    private final Map<String, Integer> woodRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1), entry("Work", 2));
+    private final Map<String, Integer> energyRequirements = Map.ofEntries(entry("Work", 1), entry("Wood", 1));
+
 
     public RecordService() {
-        this.waterRecord = new ResourceRecord("Water", waterDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.EASY);
-        this.foodRecord = new ResourceRecord("Food", foodDescription, TechLevel.TECH_LEVEL_1, Rarity.UNCOMMON, Production.MEDIUM, Difficulty.MEDIUM);
-        this.workRecord = new ResourceRecord("Work", workDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM);
-        this.educationRecord = new ResourceRecord("Education", educationDescription, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.SLOW, Difficulty.HARD);
-        this.stoneRecord = new ResourceRecord("Stone", stoneDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.MEDIUM, Difficulty.EASY);
-        this.woodRecord = new ResourceRecord("Wood", woodDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM);
-        this.energyRecord = new ResourceRecord("Energy",energyDescription1, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.FAST, Difficulty.EASY);
+        this.waterRecord = new ResourceRecord("Water", waterDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.EASY, waterRequirements);
+        this.foodRecord = new ResourceRecord("Food", foodDescription, TechLevel.TECH_LEVEL_1, Rarity.UNCOMMON, Production.MEDIUM, Difficulty.MEDIUM, foodRequirements);
+        this.workRecord = new ResourceRecord("Work", workDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM, workRequirements);
+        this.educationRecord = new ResourceRecord("Education", educationDescription, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.SLOW, Difficulty.HARD, educationRequirements);
+        this.stoneRecord = new ResourceRecord("Stone", stoneDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.MEDIUM, Difficulty.EASY, stoneRequirements);
+        this.woodRecord = new ResourceRecord("Wood", woodDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM, woodRequirements);
+        this.energyRecord = new ResourceRecord("Energy",energyDescription1, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.FAST, Difficulty.EASY, energyRequirements);
     }
-
-    public ResourceRecord getWaterRecord() {
-        return waterRecord;
-    }
-
-    public ResourceRecord getFoodRecord() {
-        return foodRecord;
-    }
-
-    public ResourceRecord getWorkRecord() {
-        return workRecord;
-    }
-
-    public ResourceRecord getEducationRecord() {
-        return educationRecord;
-    }
-
-    public ResourceRecord getStoneRecord() {
-        return stoneRecord;
-    }
-
-    public ResourceRecord getWoodRecord() {
-        return woodRecord;
-    }
-
-    public ResourceRecord getEnergyRecord() {
-        return energyRecord;
+    public ResourceRecord getRecord(String name) {
+        switch (name) {
+            case "Water" -> { return waterRecord; }
+            case "Food" -> { return foodRecord; }
+            case "Work" -> { return workRecord; }
+            case "Education" -> { return educationRecord; }
+            case "Stone" -> { return stoneRecord; }
+            case "Wood" -> { return woodRecord; }
+            case "Energy" -> { return energyRecord; }
+            default -> { return null; }
+        }
     }
 }

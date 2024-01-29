@@ -7,6 +7,7 @@ import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Resource implements Serializable {
     private final String name;
@@ -15,6 +16,7 @@ public class Resource implements Serializable {
     private final Difficulty difficulty;
     private final Production production;
     private final TechLevel techLevel;
+    private final Map<String, Integer> requirements;
     private int productionTime;
 
     public Resource(ResourceRecord record) {
@@ -24,11 +26,9 @@ public class Resource implements Serializable {
         this.difficulty = record.difficulty();
         this.production = record.production();
         this.techLevel = record.techLevel();
+        this.requirements = record.requirements();
         this.productionTime = (this.difficulty.ordinal() * this.rarity.ordinal() * this.production.ordinal() *
                 this.techLevel.ordinal());
-
-        System.out.println(this.description);
-        System.out.println(this.name + " production time: " + this.productionTime);
     }
 
     public String getName() {
@@ -48,6 +48,9 @@ public class Resource implements Serializable {
     }
     public TechLevel getTechLevel() {
         return techLevel;
+    }
+    public Map<String, Integer> getRequirements() {
+        return requirements;
     }
     public int getProductionTime() {
         return productionTime;

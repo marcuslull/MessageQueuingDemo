@@ -5,6 +5,7 @@ import com.marcuslull.momdemo.model.Resource;
 import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 import com.marcuslull.momdemo.producer.Producer;
+import com.marcuslull.momdemo.service.AssemblerService;
 import com.marcuslull.momdemo.service.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,8 @@ import java.util.concurrent.Future;
 @Component
 public class Simulation {
     private RecordService recordService;
+    private AssemblerService assemblerService;
     private Producer producer;
-    private Consumer consumer;
     private TechLevel currentTechLevel;
     public Simulation() {}
     @Autowired
@@ -25,20 +26,24 @@ public class Simulation {
     @Autowired
     public void setProducer(Producer producer) { this.producer = producer; }
     @Autowired
-    public void setConsumer(Consumer consumer) { this.consumer = consumer; }
+    public void setAssembler(AssemblerService assemblerService) { this.assemblerService = assemblerService; }
     public void start() throws ExecutionException, InterruptedException {
         System.out.println("Simulation started..."); // TODO: replace with logger
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
 
         // start producing water for free
-        ResourceRecord waterRecord = recordService.getWaterRecord();
+        ResourceRecord waterRecord = recordService.getRecord("Water");
         Resource water = new Resource(waterRecord);
+        System.out.println(water.getDescription()); // TODO: replace with logger
+        System.out.println("Water production time: " + water.getProductionTime()); // TODO: replace with logger
         producer.autoProduce(water);
 
-        // start consuming water
-        Future<List<Resource>> futureListOfResources = consumer.consume(water, 10);
-        List<Resource> ListOfResources = futureListOfResources.get();
-        System.out.println("Consumed " + ListOfResources.size() + " " + water.getName()); // TODO: replace with logger
+        // need food
+        ResourceRecord foodRecord = recordService.getRecord("Food");
+        Resource food = new Resource(foodRecord);
+        System.out.println(food.getDescription()); // TODO: replace with logger
+        System.out.println("Food production time: " + food.getProductionTime() + ". Requires: " + food.getRequirements().toString() + " each."); // TODO: replace with logger
+        assemblerService.assemble(food, 10);
     }
     private void setCurrentTechLevel(TechLevel newTechLevel) {
         this.currentTechLevel = newTechLevel;
