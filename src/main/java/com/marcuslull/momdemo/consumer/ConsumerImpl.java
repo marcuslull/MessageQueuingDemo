@@ -21,7 +21,6 @@ public class ConsumerImpl implements Consumer{
 
     @Override
     public Future<List<Resource>> consume(Resource resource, int amount) {
-        System.out.println("Consuming " + amount + " " + resource.getName());
         return CompletableFuture.supplyAsync(() -> {
             List<Resource> resources = new ArrayList<>();
             while (resources.size() < amount) {

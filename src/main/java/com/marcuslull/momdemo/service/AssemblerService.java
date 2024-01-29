@@ -22,7 +22,6 @@ public class AssemblerService {
         this.recordService = recordService;
     }
     public void assemble(Resource output, int amount) {
-        System.out.println("Assembling..." + output.getName() + " x" + amount);
         Map<String, Integer> requirements = output.getRequirements();
         for (int i = 0; i < amount; i++) {
             List<Future> listOfFutures = new ArrayList<>();
@@ -33,7 +32,6 @@ public class AssemblerService {
             for (Future future : listOfFutures) {
                 try {
                     List<Resource> listOfResources = (List<Resource>) future.get();
-                    System.out.println("Consumed " + listOfResources.size() + " " + listOfResources.getFirst().getName()); // TODO: replace with logger
                 } catch (Exception e) {
                     e.printStackTrace(); // TODO: Handle this exception
                 }

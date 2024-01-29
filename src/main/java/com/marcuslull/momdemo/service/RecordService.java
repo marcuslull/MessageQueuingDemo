@@ -103,7 +103,7 @@ public class RecordService {
             "From tilling soil to shaping stars, each labor adds a verse to the chorus, a testament to the human " +
             "spirit's tireless hum.";
     private final Map<String, Integer> waterRequirements = new HashMap<>();
-    private final Map<String, Integer> foodRequirements = Map.ofEntries(entry("Water", 20));
+    private final Map<String, Integer> foodRequirements = Map.ofEntries(entry("Water", 2));
     private final Map<String, Integer> workRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1));
     private final Map<String, Integer> educationRequirements = Map.ofEntries(entry("Water", 1), entry("Food", 1), entry("Work", 10));
     private final Map<String, Integer> stoneRequirements = Map.ofEntries(entry("Water", 3), entry("Food", 1), entry("Work", 3));

@@ -23,7 +23,6 @@ public class ProducerImpl implements Producer{
     public void autoProduce(Resource resource) {
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
-            System.out.println(resource.getName() + " producer: " + Thread.currentThread().getName() + " Sending " + resource.getName() + "...");
         };
         scheduledExecutorService.scheduleWithFixedDelay(runnable, resource.getProductionTime() * MILLIS_PER_SECOND,
                 resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
@@ -33,7 +32,6 @@ public class ProducerImpl implements Producer{
     public void produce(Resource resource, int amount) {
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
-            System.out.println(resource.getName() + " producer: " + Thread.currentThread().getName() + " Sending " + resource.getName() + "...");
         };
         for (int i = 0; i < amount; i++) {
             scheduledExecutorService.schedule(runnable, resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
