@@ -3,9 +3,9 @@ package com.marcuslull.momdemo.controller;
 import com.marcuslull.momdemo.model.Resource;
 import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
-import com.marcuslull.momdemo.producer.Producer;
 import com.marcuslull.momdemo.service.AssemblerService;
 import com.marcuslull.momdemo.service.CountService;
+import com.marcuslull.momdemo.service.ProducerService;
 import com.marcuslull.momdemo.service.RecordService;
 import com.marcuslull.momdemo.view.ViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class Simulation {
     private RecordService recordService;
     private AssemblerService assemblerService;
     private CountService countService;
-    private Producer producer;
+    private ProducerService producerService;
     private TechLevel currentTechLevel;
     private Resource water;
     private Resource food;
@@ -37,7 +37,7 @@ public class Simulation {
     @Autowired
     public void setRecordService(RecordService recordService) { this.recordService = recordService; }
     @Autowired
-    public void setProducer(Producer producer) { this.producer = producer; }
+    public void setProducer(ProducerService producerService) { this.producerService = producerService; }
     @Autowired
     public void setAssembler(AssemblerService assemblerService) { this.assemblerService = assemblerService; }
     @Autowired
@@ -68,7 +68,7 @@ public class Simulation {
     }
     public void start() throws ExecutionException, InterruptedException {
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
-        producer.autoProduce(water);
+        producerService.autoProduce(water);
         //assemblerService.assemble(food, 10);
     }
     private void setCurrentTechLevel(TechLevel newTechLevel) {

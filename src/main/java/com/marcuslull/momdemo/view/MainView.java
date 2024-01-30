@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -31,7 +32,9 @@ public class MainView extends VerticalLayout {
     private final ScheduledExecutorService scheduledExecutorService;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
     private final H2 titleH1 = new H2("Message queueing demo");
+    private final HorizontalLayout startStopButtonLayout = new HorizontalLayout();
     private final Button startButton = new Button("Start");
+    private final Button terminateButton = new Button("Terminate");
     private final TextField techLevel = new TextField();
     private final Grid<Count> countGrid = new Grid<>(Count.class);
     private List<Count> counts;
@@ -52,6 +55,7 @@ public class MainView extends VerticalLayout {
         setMargin(true);
         setWidth("98%");
 
+        startStopButtonLayout.add(startButton, terminateButton);
         startButton.addClickListener(e -> {
             try {
                 simulation.start();
@@ -71,6 +75,15 @@ public class MainView extends VerticalLayout {
             scheduledExecutorService.scheduleWithFixedDelay(runnable, 1, 1, TimeUnit.SECONDS);
         });
 
+        terminateButton.addClickListener(e -> {
+            scheduledExecutorService.shutdown();
+            try {
+                scheduledExecutorService.awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         techLevel.setValue(viewModel.getTechLevel());
 
         counts = viewModel.getCounts();
@@ -86,6 +99,6 @@ public class MainView extends VerticalLayout {
         resourceGrid.getColumnByKey("description").setFlexGrow(8);
         resourceGrid.getColumnByKey("requirements").setFlexGrow(4);
 
-        add(titleH1, startButton, techLevel, countGrid, resourceGrid, techLevelLabel);
+        add(titleH1, startStopButtonLayout, techLevel, countGrid, resourceGrid, techLevelLabel);
     }
 }

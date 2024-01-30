@@ -1,8 +1,6 @@
 package com.marcuslull.momdemo.service;
 
-import com.marcuslull.momdemo.consumer.Consumer;
 import com.marcuslull.momdemo.model.Resource;
-import com.marcuslull.momdemo.producer.Producer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,13 +10,13 @@ import java.util.concurrent.Future;
 
 @Service
 public class AssemblerService {
-    private final Consumer consumer;
-    private final Producer producer;
+    private final ConsumerService consumerService;
+    private final ProducerService producerService;
     private final RecordService recordService;
 
-    public AssemblerService(Consumer consumer, Producer producer, RecordService recordService) {
-        this.consumer = consumer;
-        this.producer = producer;
+    public AssemblerService(ConsumerService consumerService, ProducerService producerService, RecordService recordService) {
+        this.consumerService = consumerService;
+        this.producerService = producerService;
         this.recordService = recordService;
     }
     public void assemble(Resource output, int amount) {
@@ -27,7 +25,7 @@ public class AssemblerService {
             List<Future> listOfFutures = new ArrayList<>();
             for (Map.Entry<String, Integer> entry : requirements.entrySet()) {
                 Resource resource = new Resource(recordService.getRecord(entry.getKey()));
-                listOfFutures.add(consumer.consume(resource, entry.getValue()));
+                listOfFutures.add(consumerService.consume(resource, entry.getValue()));
             }
             for (Future future : listOfFutures) {
                 try {
@@ -36,7 +34,7 @@ public class AssemblerService {
                     e.printStackTrace(); // TODO: Handle this exception
                 }
             }
-            producer.produce(output, 1);
+            producerService.produce(output, 1);
         }
     }
 }

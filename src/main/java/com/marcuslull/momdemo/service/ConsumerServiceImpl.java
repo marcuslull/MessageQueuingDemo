@@ -1,4 +1,4 @@
-package com.marcuslull.momdemo.consumer;
+package com.marcuslull.momdemo.service;
 
 import com.marcuslull.momdemo.model.Resource;
 import org.springframework.amqp.core.Message;
@@ -11,11 +11,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 @Service
-public class ConsumerImpl implements Consumer{
+public class ConsumerServiceImpl implements ConsumerService {
     private final RabbitTemplate rabbitTemplate;
     private final long RESOURCE_CONSUMPTION_ATTEMPT_INTERVAL = 500;
 
-    public ConsumerImpl(RabbitTemplate rabbitTemplate) {
+    public ConsumerServiceImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 

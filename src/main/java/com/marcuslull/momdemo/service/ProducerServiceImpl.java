@@ -1,4 +1,4 @@
-package com.marcuslull.momdemo.producer;
+package com.marcuslull.momdemo.service;
 
 import com.marcuslull.momdemo.model.Resource;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -9,13 +9,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ProducerImpl implements Producer{
+public class ProducerServiceImpl implements ProducerService {
     private final RabbitTemplate rabbitTemplate;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Long MILLIS_PER_SECOND = 1000L;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
 
-    public ProducerImpl(RabbitTemplate rabbitTemplate) {
+    public ProducerServiceImpl(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
         this.scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
     }
