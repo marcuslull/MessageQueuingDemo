@@ -21,6 +21,7 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     public Future<List<Resource>> consume(Resource resource, int amount) {
+        // TODO: Implement cleanup and escrow to implement a transactional system
         return CompletableFuture.supplyAsync(() -> {
             List<Resource> resources = new ArrayList<>();
             while (resources.size() < amount) {

@@ -11,44 +11,35 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ProducerServiceImpl implements ProducerService {
     private final RabbitTemplate rabbitTemplate;
-    private final ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService scheduledExecutorService;
+    private final ExecutorsTrackingService executorsTrackingService;
     private final Long MILLIS_PER_SECOND = 1000L;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
 
-    public ProducerServiceImpl(RabbitTemplate rabbitTemplate) {
+    public ProducerServiceImpl(RabbitTemplate rabbitTemplate, ExecutorsTrackingService executorsTrackingService) {
         this.rabbitTemplate = rabbitTemplate;
-        this.scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
+        this.executorsTrackingService = executorsTrackingService;
     }
     @Override
     public void autoProduce(Resource resource) {
+        scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
         };
         scheduledExecutorService.scheduleWithFixedDelay(runnable, resource.getProductionTime() * MILLIS_PER_SECOND,
                 resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
+        executorsTrackingService.register(scheduledExecutorService);
     }
 
     @Override
     public void produce(Resource resource, int amount) {
+        scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
         };
         for (int i = 0; i < amount; i++) {
             scheduledExecutorService.schedule(runnable, resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    @Override
-    public void stopProduction() {
-        scheduledExecutorService.shutdown();
-        try {
-            long EXECUTOR_SHUTDOWN_TIMEOUT = 3L;
-            if(scheduledExecutorService.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS)) {
-                System.out.println("Graceful shutdown of production successful.");
-            }
-        } catch (InterruptedException e) {
-            // TODO: Handle this properly
-            System.out.println("Producer: " + Thread.currentThread().getName() + " interrupted.");
+            executorsTrackingService.register(scheduledExecutorService);
         }
     }
 }

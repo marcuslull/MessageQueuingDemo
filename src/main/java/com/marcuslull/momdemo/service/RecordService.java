@@ -121,14 +121,14 @@ public class RecordService {
         this.energyRecord = new ResourceRecord("Energy",energyDescription1, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.FAST, Difficulty.EASY, energyRequirements);
     }
     public ResourceRecord getRecord(String name) {
-        switch (name) {
-            case "Water" -> { return waterRecord; }
-            case "Food" -> { return foodRecord; }
-            case "Work" -> { return workRecord; }
-            case "Education" -> { return educationRecord; }
-            case "Stone" -> { return stoneRecord; }
-            case "Wood" -> { return woodRecord; }
-            case "Energy" -> { return energyRecord; }
+        switch (name.toLowerCase()) {
+            case "water" -> { return waterRecord; }
+            case "food" -> { return foodRecord; }
+            case "work" -> { return workRecord; }
+            case "education" -> { return educationRecord; }
+            case "stone" -> { return stoneRecord; }
+            case "wood" -> { return woodRecord; }
+            case "energy" -> { return energyRecord; }
             default -> { return null; }
         }
     }

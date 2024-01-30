@@ -1,20 +1,19 @@
-package com.marcuslull.momdemo.controller;
+package com.marcuslull.momdemo.service;
 
 import com.marcuslull.momdemo.model.Resource;
 import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
-import com.marcuslull.momdemo.service.AssemblerService;
-import com.marcuslull.momdemo.service.CountService;
-import com.marcuslull.momdemo.service.ProducerService;
-import com.marcuslull.momdemo.service.RecordService;
 import com.marcuslull.momdemo.view.ViewModel;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutionException;
 
 @Component
-public class Simulation {
+public class SimulationService {
+    private final ExecutorsTrackingService executorsTrackingService;
+    private final RabbitTemplate rabbitTemplate;
     private ViewModel viewModel;
     private RecordService recordService;
     private AssemblerService assemblerService;
@@ -29,7 +28,9 @@ public class Simulation {
     private Resource wood;
     private Resource energy;
 
-    public Simulation(ViewModel viewModel) {
+    public SimulationService(ExecutorsTrackingService executorsTrackingService, RabbitTemplate rabbitTemplate, ViewModel viewModel) {
+        this.executorsTrackingService = executorsTrackingService;
+        this.rabbitTemplate = rabbitTemplate;
         this.viewModel = viewModel;
     }
     @Autowired
@@ -64,12 +65,25 @@ public class Simulation {
         ResourceRecord energyRecord = recordService.getRecord("Energy");
         energy = new Resource(energyRecord);
         viewModel.setResources(energy);
-        countService.monitorCount();
     }
     public void start() throws ExecutionException, InterruptedException {
+        countService.monitorCount();
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
         producerService.autoProduce(water);
         //assemblerService.assemble(food, 10);
+    }
+    public void reset() {
+        rabbitTemplate.execute(channel -> {
+            channel.queuePurge("Water");
+            channel.queuePurge("Food");
+            channel.queuePurge("Work");
+            channel.queuePurge("Education");
+            channel.queuePurge("Stone");
+            channel.queuePurge("Wood");
+            channel.queuePurge("Energy");
+            return null;
+        });
+        setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
     }
     private void setCurrentTechLevel(TechLevel newTechLevel) {
         this.currentTechLevel = newTechLevel;

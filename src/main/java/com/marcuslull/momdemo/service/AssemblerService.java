@@ -31,7 +31,7 @@ public class AssemblerService {
                 try {
                     List<Resource> listOfResources = (List<Resource>) future.get();
                 } catch (Exception e) {
-                    e.printStackTrace(); // TODO: Handle this exception
+                    System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
                 }
             }
             producerService.produce(output, 1);
