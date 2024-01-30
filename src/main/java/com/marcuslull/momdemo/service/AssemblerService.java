@@ -29,7 +29,7 @@ public class AssemblerService {
             }
             for (Future future : listOfFutures) {
                 try {
-                    List<Resource> listOfResources = (List<Resource>) future.get();
+                    List<Resource> listOfResources = (List<Resource>) future.get(); // this is discarded simulating the use of the resources
                 } catch (Exception e) {
                     System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
                 }

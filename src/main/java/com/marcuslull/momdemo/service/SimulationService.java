@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 public class SimulationService {
-    private final ExecutorsTrackingService executorsTrackingService;
+    private final ExecutorTrackingService executorTrackingService;
     private final RabbitTemplate rabbitTemplate;
     private ViewModel viewModel;
     private RecordService recordService;
@@ -28,8 +28,8 @@ public class SimulationService {
     private Resource wood;
     private Resource energy;
 
-    public SimulationService(ExecutorsTrackingService executorsTrackingService, RabbitTemplate rabbitTemplate, ViewModel viewModel) {
-        this.executorsTrackingService = executorsTrackingService;
+    public SimulationService(ExecutorTrackingService executorTrackingService, RabbitTemplate rabbitTemplate, ViewModel viewModel) {
+        this.executorTrackingService = executorTrackingService;
         this.rabbitTemplate = rabbitTemplate;
         this.viewModel = viewModel;
     }

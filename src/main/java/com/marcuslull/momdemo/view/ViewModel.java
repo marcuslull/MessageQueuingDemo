@@ -12,6 +12,7 @@ public class ViewModel {
     private String techLevel = "Press start to begin";
     private List<Count> counts = new ArrayList<>();
     private List<Resource> resources = new ArrayList<>();
+    private List<Boolean> buttonStates = new ArrayList<>();
 
     public ViewModel() {
     }
@@ -39,5 +40,13 @@ public class ViewModel {
 
     public void setResources(Resource resource) {
         this.resources.add(resource);
+    }
+
+    public List<Boolean> getButtonStates() {
+        return buttonStates;
+    }
+
+    public void setButtonStates(List<Boolean> buttonStates) {
+        this.buttonStates = buttonStates;
     }
 }

@@ -12,13 +12,13 @@ import java.util.concurrent.TimeUnit;
 public class ProducerServiceImpl implements ProducerService {
     private final RabbitTemplate rabbitTemplate;
     private ScheduledExecutorService scheduledExecutorService;
-    private final ExecutorsTrackingService executorsTrackingService;
+    private final ExecutorTrackingService executorTrackingService;
     private final Long MILLIS_PER_SECOND = 1000L;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
 
-    public ProducerServiceImpl(RabbitTemplate rabbitTemplate, ExecutorsTrackingService executorsTrackingService) {
+    public ProducerServiceImpl(RabbitTemplate rabbitTemplate, ExecutorTrackingService executorTrackingService) {
         this.rabbitTemplate = rabbitTemplate;
-        this.executorsTrackingService = executorsTrackingService;
+        this.executorTrackingService = executorTrackingService;
     }
     @Override
     public void autoProduce(Resource resource) {
@@ -28,7 +28,7 @@ public class ProducerServiceImpl implements ProducerService {
         };
         scheduledExecutorService.scheduleWithFixedDelay(runnable, resource.getProductionTime() * MILLIS_PER_SECOND,
                 resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
-        executorsTrackingService.register(scheduledExecutorService);
+        executorTrackingService.register(scheduledExecutorService);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ProducerServiceImpl implements ProducerService {
         };
         for (int i = 0; i < amount; i++) {
             scheduledExecutorService.schedule(runnable, resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
-            executorsTrackingService.register(scheduledExecutorService);
+            executorTrackingService.register(scheduledExecutorService);
         }
     }
 }

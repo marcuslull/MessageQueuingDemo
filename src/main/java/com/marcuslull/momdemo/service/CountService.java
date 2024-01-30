@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class CountService {
     private final RabbitTemplate rabbitTemplate;
     private ScheduledExecutorService scheduledExecutorService;
-    private final ExecutorsTrackingService executorsTrackingService;
+    private final ExecutorTrackingService executorTrackingService;
     private final ViewModel viewModel;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
     private List<String> resources = List.of("Water", "Food", "Work", "Education", "Stone", "Wood", "Energy");
@@ -26,13 +26,13 @@ public class CountService {
     private long wood;
     private long energy;
 
-    public CountService(RabbitTemplate rabbitTemplate, ExecutorsTrackingService executorsTrackingService, ViewModel viewModel) {
+    public CountService(RabbitTemplate rabbitTemplate, ExecutorTrackingService executorTrackingService, ViewModel viewModel) {
         this.rabbitTemplate = rabbitTemplate;
-        this.executorsTrackingService = executorsTrackingService;
+        this.executorTrackingService = executorTrackingService;
         this.viewModel = viewModel;
     }
 
-    private Count getCount() {
+    public Count getCount() {
         for (String resource : resources) {
             long count = rabbitTemplate.execute(channel -> channel.messageCount(resource));
             switch (resource) {
@@ -55,6 +55,6 @@ public class CountService {
             viewModel.setCounts(getCount());
         };
         scheduledExecutorService.scheduleWithFixedDelay(runnable, 0, 1, TimeUnit.SECONDS);
-        executorsTrackingService.register(scheduledExecutorService);
+        executorTrackingService.register(scheduledExecutorService);
     }
 }

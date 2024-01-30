@@ -8,10 +8,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ExecutorsTrackingService {
+public class ExecutorTrackingService {
     private final List<ScheduledExecutorService> scheduledExecutorServiceList;
 
-    public ExecutorsTrackingService() {
+    public ExecutorTrackingService() {
         this.scheduledExecutorServiceList = new ArrayList<>();
     }
     public void register(ScheduledExecutorService scheduledExecutorService) {

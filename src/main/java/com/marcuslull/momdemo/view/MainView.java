@@ -2,10 +2,7 @@ package com.marcuslull.momdemo.view;
 
 import com.marcuslull.momdemo.model.Count;
 import com.marcuslull.momdemo.model.Resource;
-import com.marcuslull.momdemo.service.AssemblerService;
-import com.marcuslull.momdemo.service.ExecutorsTrackingService;
-import com.marcuslull.momdemo.service.RecordService;
-import com.marcuslull.momdemo.service.SimulationService;
+import com.marcuslull.momdemo.service.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -33,7 +30,8 @@ public class MainView extends VerticalLayout {
     private final RecordService recordService;
     private final AssemblerService assemblerService;
     private ScheduledExecutorService scheduledExecutorService;
-    private final ExecutorsTrackingService executorsTrackingService;
+    private final ExecutorTrackingService executorTrackingService;
+    private final CountService countService;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
     private final H2 titleH1 = new H2("Message queueing demo");
     private final HorizontalLayout startStopButtonLayout = new HorizontalLayout();
@@ -55,12 +53,13 @@ public class MainView extends VerticalLayout {
     private final Label techLevelLabel = new Label("Unlock more resources by increasing the tech level.");
     Binder<ViewModel> binder = new Binder<>(ViewModel.class);
 
-    public MainView(SimulationService simulationService, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, ExecutorsTrackingService executorsTrackingService) {
+    public MainView(SimulationService simulationService, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, ExecutorTrackingService executorTrackingService, CountService countService) {
         this.simulationService = simulationService;
         this.viewModel = viewModel;
         this.recordService = recordService;
         this.assemblerService = assemblerService;
-        this.executorsTrackingService = executorsTrackingService;
+        this.executorTrackingService = executorTrackingService;
+        this.countService = countService;
         this.binder.bindInstanceFields(this);
         this.binder.setBean(viewModel);
         this.simulationService.init();
@@ -114,7 +113,7 @@ public class MainView extends VerticalLayout {
                 });
             };
             scheduledExecutorService.scheduleWithFixedDelay(runnable, 1, 1, TimeUnit.SECONDS);
-            executorsTrackingService.register(scheduledExecutorService);
+            executorTrackingService.register(scheduledExecutorService);
         });
 
         stopButton.addClickListener(e -> {
@@ -124,7 +123,7 @@ public class MainView extends VerticalLayout {
             createButtonLayout.getChildren().forEach(button -> {
                 button.getElement().setEnabled(false);
             });
-            executorsTrackingService.shutdownAll();
+            executorTrackingService.shutdownAll();
         });
 
         resetButton.addClickListener(e -> {
@@ -138,9 +137,9 @@ public class MainView extends VerticalLayout {
         createButtonLayout.getChildren().forEach(button -> {
             button.getElement()
                     .addEventListener("click", event -> {
-                        assemblerService.assemble(
-                                new Resource(recordService.getRecord(
-                                        button.getElement().getText().substring(8))), 1);
+                        assemblerService.assemble(new Resource(recordService.getRecord(
+                                button.getElement().getText().substring(8))), 1);
+                        button.getElement().setEnabled(false);
             });
         });
     }
