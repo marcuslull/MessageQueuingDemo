@@ -8,7 +8,6 @@ import com.marcuslull.momdemo.service.AssemblerService;
 import com.marcuslull.momdemo.service.CountService;
 import com.marcuslull.momdemo.service.RecordService;
 import com.marcuslull.momdemo.view.ViewModel;
-import com.vaadin.flow.component.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +21,14 @@ public class Simulation {
     private CountService countService;
     private Producer producer;
     private TechLevel currentTechLevel;
+    private Resource water;
+    private Resource food;
+    private Resource work;
+    private Resource education;
+    private Resource stone;
+    private Resource wood;
+    private Resource energy;
+
     public Simulation(ViewModel viewModel) {
         this.viewModel = viewModel;
     }
@@ -35,38 +42,34 @@ public class Simulation {
     public void setAssembler(AssemblerService assemblerService) { this.assemblerService = assemblerService; }
     @Autowired
     public void setCountService(CountService countService) { this.countService = countService; }
-    public void start() throws ExecutionException, InterruptedException {
+    public void init() {
         ResourceRecord waterRecord = recordService.getRecord("Water");
-        Resource water = new Resource(waterRecord);
+        water = new Resource(waterRecord);
         viewModel.setResources(water);
         ResourceRecord foodRecord = recordService.getRecord("Food");
-        Resource food = new Resource(foodRecord);
+        food = new Resource(foodRecord);
         viewModel.setResources(food);
         ResourceRecord workRecord = recordService.getRecord("Work");
-        Resource work = new Resource(workRecord);
+        work = new Resource(workRecord);
         viewModel.setResources(work);
         ResourceRecord educationRecord = recordService.getRecord("Education");
-        Resource education = new Resource(educationRecord);
+        education = new Resource(educationRecord);
         viewModel.setResources(education);
         ResourceRecord stoneRecord = recordService.getRecord("Stone");
-        Resource stone = new Resource(stoneRecord);
+        stone = new Resource(stoneRecord);
         viewModel.setResources(stone);
         ResourceRecord woodRecord = recordService.getRecord("Wood");
-        Resource wood = new Resource(woodRecord);
+        wood = new Resource(woodRecord);
         viewModel.setResources(wood);
         ResourceRecord energyRecord = recordService.getRecord("Energy");
-        Resource energy = new Resource(energyRecord);
+        energy = new Resource(energyRecord);
         viewModel.setResources(energy);
-
-        viewModel.setCounts(countService.getCount());
-
+        countService.monitorCount();
+    }
+    public void start() throws ExecutionException, InterruptedException {
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
-
         producer.autoProduce(water);
         //assemblerService.assemble(food, 10);
-
-
-        UI.getCurrent().getPage().reload();
     }
     private void setCurrentTechLevel(TechLevel newTechLevel) {
         this.currentTechLevel = newTechLevel;
