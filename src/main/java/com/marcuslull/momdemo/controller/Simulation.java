@@ -5,6 +5,7 @@ import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 import com.marcuslull.momdemo.producer.Producer;
 import com.marcuslull.momdemo.service.AssemblerService;
+import com.marcuslull.momdemo.service.CountService;
 import com.marcuslull.momdemo.service.RecordService;
 import com.marcuslull.momdemo.view.ViewModel;
 import com.vaadin.flow.component.UI;
@@ -18,6 +19,7 @@ public class Simulation {
     private ViewModel viewModel;
     private RecordService recordService;
     private AssemblerService assemblerService;
+    private CountService countService;
     private Producer producer;
     private TechLevel currentTechLevel;
     public Simulation(ViewModel viewModel) {
@@ -31,21 +33,38 @@ public class Simulation {
     public void setProducer(Producer producer) { this.producer = producer; }
     @Autowired
     public void setAssembler(AssemblerService assemblerService) { this.assemblerService = assemblerService; }
+    @Autowired
+    public void setCountService(CountService countService) { this.countService = countService; }
     public void start() throws ExecutionException, InterruptedException {
-        setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
-
-        // start producing water for free
         ResourceRecord waterRecord = recordService.getRecord("Water");
         Resource water = new Resource(waterRecord);
-        producer.autoProduce(water);
         viewModel.setResources(water);
-
-
-        // need food
         ResourceRecord foodRecord = recordService.getRecord("Food");
         Resource food = new Resource(foodRecord);
-        assemblerService.assemble(food, 10);
         viewModel.setResources(food);
+        ResourceRecord workRecord = recordService.getRecord("Work");
+        Resource work = new Resource(workRecord);
+        viewModel.setResources(work);
+        ResourceRecord educationRecord = recordService.getRecord("Education");
+        Resource education = new Resource(educationRecord);
+        viewModel.setResources(education);
+        ResourceRecord stoneRecord = recordService.getRecord("Stone");
+        Resource stone = new Resource(stoneRecord);
+        viewModel.setResources(stone);
+        ResourceRecord woodRecord = recordService.getRecord("Wood");
+        Resource wood = new Resource(woodRecord);
+        viewModel.setResources(wood);
+        ResourceRecord energyRecord = recordService.getRecord("Energy");
+        Resource energy = new Resource(energyRecord);
+        viewModel.setResources(energy);
+
+        viewModel.setCounts(countService.getCount());
+
+        setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
+
+        producer.autoProduce(water);
+        //assemblerService.assemble(food, 10);
+
 
         UI.getCurrent().getPage().reload();
     }

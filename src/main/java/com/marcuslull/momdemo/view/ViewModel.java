@@ -28,8 +28,9 @@ public class ViewModel {
         return counts;
     }
 
-    public void setCounts(List<Count> counts) {
-        this.counts = counts;
+    public void setCounts(Count count) {
+        this.counts.clear();
+        this.counts.add(count);
     }
 
     public List<Resource> getResources() {
