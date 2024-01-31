@@ -5,20 +5,18 @@ import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 import com.marcuslull.momdemo.view.ViewModel;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutionException;
 
 @Component
 public class SimulationService {
-    private final ExecutorTrackingService executorTrackingService;
     private final RabbitTemplate rabbitTemplate;
-    private ViewModel viewModel;
-    private RecordService recordService;
-    private AssemblerService assemblerService;
-    private CountService countService;
-    private ProducerService producerService;
+    private final ViewModel viewModel;
+    private final RecordService recordService;
+    private final AssemblerService assemblerService;
+    private final CountService countService;
+    private final ProducerService producerService;
     private TechLevel currentTechLevel;
     private Resource water;
     private Resource food;
@@ -28,21 +26,14 @@ public class SimulationService {
     private Resource wood;
     private Resource energy;
 
-    public SimulationService(ExecutorTrackingService executorTrackingService, RabbitTemplate rabbitTemplate, ViewModel viewModel) {
-        this.executorTrackingService = executorTrackingService;
+    public SimulationService(RabbitTemplate rabbitTemplate, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, CountService countService, ProducerService producerService) {
         this.rabbitTemplate = rabbitTemplate;
         this.viewModel = viewModel;
+        this.recordService = recordService;
+        this.assemblerService = assemblerService;
+        this.countService = countService;
+        this.producerService = producerService;
     }
-    @Autowired
-    public void setViewModel(ViewModel viewModel) { this.viewModel = viewModel; }
-    @Autowired
-    public void setRecordService(RecordService recordService) { this.recordService = recordService; }
-    @Autowired
-    public void setProducer(ProducerService producerService) { this.producerService = producerService; }
-    @Autowired
-    public void setAssembler(AssemblerService assemblerService) { this.assemblerService = assemblerService; }
-    @Autowired
-    public void setCountService(CountService countService) { this.countService = countService; }
     public void init() {
         ResourceRecord waterRecord = recordService.getRecord("Water");
         water = new Resource(waterRecord);
