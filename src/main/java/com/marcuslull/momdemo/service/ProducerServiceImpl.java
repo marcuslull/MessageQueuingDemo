@@ -33,13 +33,8 @@ public class ProducerServiceImpl implements ProducerService {
 
     @Override
     public void produce(Resource resource, int amount) {
-        scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
-        Runnable runnable = () -> {
-            rabbitTemplate.convertAndSend(resource.getName(), resource);
-        };
         for (int i = 0; i < amount; i++) {
-            scheduledExecutorService.schedule(runnable, resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
-            executorTrackingService.register(scheduledExecutorService);
+            rabbitTemplate.convertAndSend(resource.getName(), resource);
         }
     }
 }

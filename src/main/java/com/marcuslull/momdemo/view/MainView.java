@@ -11,8 +11,6 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -33,12 +31,15 @@ public class MainView extends VerticalLayout {
     private final ExecutorTrackingService executorTrackingService;
     private final CountService countService;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
-    private final H2 titleH1 = new H2("Message queueing demo");
+    private final H2 titleH1 = new H2("Message queueing and Threading demo.");
     private final HorizontalLayout startStopButtonLayout = new HorizontalLayout();
     private final Button startButton = new Button("Start");
     private final Button stopButton = new Button("Stop");
     private final Button resetButton = new Button("Reset");
-    private final TextField techLevel = new TextField();
+    private final HorizontalLayout statusLayout = new HorizontalLayout();
+    private final Label techLabel = new Label();
+    private final Label focusLabel = new Label();
+    private final Label countGridLabel = new Label("Available resources");
     private final Grid<Count> countGrid = new Grid<>(Count.class);
     private List<Count> counts;
     private final Grid<Resource> resourceGrid = new Grid<>(Resource.class);
@@ -50,8 +51,8 @@ public class MainView extends VerticalLayout {
     private final Button woodButton = new Button("Produce wood");
     private final Button energyButton = new Button("Produce energy");
     private final List<Resource> resources;
+    private final Label resourceGridLabel = new Label("Resource information");
     private final Label techLevelLabel = new Label("Unlock more resources by increasing the tech level.");
-    Binder<ViewModel> binder = new Binder<>(ViewModel.class);
 
     public MainView(SimulationService simulationService, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, ExecutorTrackingService executorTrackingService, CountService countService) {
         this.simulationService = simulationService;
@@ -60,16 +61,20 @@ public class MainView extends VerticalLayout {
         this.assemblerService = assemblerService;
         this.executorTrackingService = executorTrackingService;
         this.countService = countService;
-        this.binder.bindInstanceFields(this);
-        this.binder.setBean(viewModel);
         this.simulationService.init();
         this.stopButton.setEnabled(false);
         this.startStopButtonLayout.add(startButton, stopButton, resetButton);
-        this.techLevel.setValue(viewModel.getTechLevel());
+        this.techLabel.setText("Tech level: " + viewModel.getTechLabel());
+        this.focusLabel.setText("Available focus: " + viewModel.getFocus());
+        this.statusLayout.setWidth("100%");
+        this.statusLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
+        this.statusLayout.add(techLabel, focusLabel);
         this.counts = viewModel.getCounts();
         this.countGrid.setItems(counts);
         this.countGrid.setColumns("water", "food", "work", "education", "stone", "wood", "energy");
         this.countGrid.setHeight("100px");
+        this.createButtonLayout.setWidth("100%");
+        this.createButtonLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
         this.foodButton.setEnabled(false);
         this.workButton.setEnabled(false);
         this.educationButton.setEnabled(false);
@@ -87,7 +92,7 @@ public class MainView extends VerticalLayout {
 
         setMargin(true);
         setWidth("98%");
-        add(titleH1, startStopButtonLayout, techLevel, countGrid, createButtonLayout, resourceGrid, techLevelLabel);
+        add(titleH1, startStopButtonLayout, statusLayout, countGridLabel, countGrid, createButtonLayout, resourceGridLabel, resourceGrid, techLevelLabel);
 
         // Listeners
         startButton.addClickListener(e -> {
@@ -108,11 +113,22 @@ public class MainView extends VerticalLayout {
             Runnable runnable = () -> {
                 ui.access(() -> {
                     countGrid.setItems(viewModel.getCounts());
-                    techLevel.setValue(viewModel.getTechLevel());
+                    techLabel.setText("Tech level: " + viewModel.getTechLabel());
+                    assemblerService.updateViewModel();
+                    if (viewModel.getFocus() == 0) {
+                        createButtonLayout.getChildren().forEach(button -> {
+                            button.getElement().setEnabled(false);
+                        });
+                    } else {
+                        createButtonLayout.getChildren().forEach(button -> {
+                            button.getElement().setEnabled(true);
+                        });
+                    }
+                    focusLabel.setText("Available focus: " + viewModel.getFocus());
                     ui.push();
                 });
             };
-            scheduledExecutorService.scheduleWithFixedDelay(runnable, 1, 1, TimeUnit.SECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(runnable, 200, 200, TimeUnit.MILLISECONDS);
             executorTrackingService.register(scheduledExecutorService);
         });
 
@@ -139,7 +155,6 @@ public class MainView extends VerticalLayout {
                     .addEventListener("click", event -> {
                         assemblerService.assemble(new Resource(recordService.getRecord(
                                 button.getElement().getText().substring(8))), 1);
-                        //button.getElement().setEnabled(false);
             });
         });
     }

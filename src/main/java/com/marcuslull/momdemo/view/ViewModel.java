@@ -9,20 +9,21 @@ import java.util.List;
 
 @Component
 public class ViewModel {
-    private String techLevel = "Press start to begin";
-    private List<Count> counts = new ArrayList<>();
-    private List<Resource> resources = new ArrayList<>();
+    private String techLabel = "0";
+    private final List<Count> counts = new ArrayList<>();
+    private final List<Resource> resources = new ArrayList<>();
     private List<Boolean> buttonStates = new ArrayList<>();
+    private int focus = 0;
 
     public ViewModel() {
     }
 
-    public String getTechLevel() {
-        return techLevel;
+    public String getTechLabel() {
+        return techLabel;
     }
 
-    public void setTechLevel(String techLevel) {
-        this.techLevel = techLevel;
+    public void setTechLabel(String techLabel) {
+        this.techLabel = techLabel;
     }
 
     public List<Count> getCounts() {
@@ -48,5 +49,13 @@ public class ViewModel {
 
     public void setButtonStates(List<Boolean> buttonStates) {
         this.buttonStates = buttonStates;
+    }
+
+    public int getFocus() {
+        return focus;
+    }
+
+    public void setFocus(int focus) {
+        this.focus = focus;
     }
 }

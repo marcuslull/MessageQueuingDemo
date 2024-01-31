@@ -68,8 +68,10 @@ public class SimulationService {
     }
     public void start() throws ExecutionException, InterruptedException {
         countService.monitorCount();
+        assemblerService.updateViewModel();
         setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
         producerService.autoProduce(water);
+
         //assemblerService.assemble(food, 10);
     }
     public void reset() {
@@ -88,10 +90,10 @@ public class SimulationService {
     private void setCurrentTechLevel(TechLevel newTechLevel) {
         this.currentTechLevel = newTechLevel;
         switch (newTechLevel) {
-            case TECH_LEVEL_1 -> viewModel.setTechLevel("Tech Level 1 achieved!");
-            case TECH_LEVEL_2 -> viewModel.setTechLevel("Tech Level 2 achieved!");
-            case TECH_LEVEL_3 -> viewModel.setTechLevel("Tech Level 3 achieved!");
-            default -> viewModel.setTechLevel("Simulation complete!");
+            case TECH_LEVEL_1 -> viewModel.setTechLabel("1");
+            case TECH_LEVEL_2 -> viewModel.setTechLabel("2");
+            case TECH_LEVEL_3 -> viewModel.setTechLabel("3");
+            default -> viewModel.setTechLabel("Simulation complete!");
         }
     }
     public void advanceTechLevel() { setCurrentTechLevel(TechLevel.values()[currentTechLevel.ordinal() + 1]); }
