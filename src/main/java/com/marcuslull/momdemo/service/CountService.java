@@ -32,7 +32,7 @@ public class CountService {
         this.viewModel = viewModel;
     }
 
-    public Count getCount() {
+    private Count getCount() {
         for (String resource : resources) {
             long count = rabbitTemplate.execute(channel -> channel.messageCount(resource));
             switch (resource) {

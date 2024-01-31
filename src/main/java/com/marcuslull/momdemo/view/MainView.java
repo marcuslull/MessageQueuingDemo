@@ -139,7 +139,7 @@ public class MainView extends VerticalLayout {
                     .addEventListener("click", event -> {
                         assemblerService.assemble(new Resource(recordService.getRecord(
                                 button.getElement().getText().substring(8))), 1);
-                        button.getElement().setEnabled(false);
+                        //button.getElement().setEnabled(false);
             });
         });
     }
