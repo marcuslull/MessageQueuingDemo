@@ -20,7 +20,7 @@ public class AssemblerService {
     private final ProducerService producerService;
     private final RecordService recordService;
     private final ViewModel viewModel;
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
     private final SynchronousQueue<Runnable> synchronousQueue;
     public static final int EXECUTOR_CORE_POOL_SIZE = 10;
     private final ExecutorTrackingService executorTrackingService;
@@ -36,6 +36,7 @@ public class AssemblerService {
                 1L, TimeUnit.MILLISECONDS, synchronousQueue); // keep alive must be non-zero for .allowCoreThreadTimeOut(true) to work
     }
     public void assemble(Resource output, int amount) {
+        initializeExecutor();
         Runnable runnable = (() -> {
             Map<String, Integer> requirements = output.getRequirements();
             for (int i = 0; i < amount; i++) {
@@ -65,9 +66,16 @@ public class AssemblerService {
         });
         threadPoolExecutor.allowCoreThreadTimeOut(true); // timeout idle threads otherwise it messes up the focus count
         threadPoolExecutor.submit(runnable);
-        //executorTrackingService.register(executorService);
+        executorTrackingService.register(threadPoolExecutor);
     }
     public void updateViewModel() {
         viewModel.setFocus(threadPoolExecutor.getCorePoolSize() - threadPoolExecutor.getActiveCount());
+    }
+    private void initializeExecutor() {
+        // if the stop button is pressed and the executor is terminated, create a new one
+        if (this.threadPoolExecutor.isTerminated()) {
+            this.threadPoolExecutor = new ThreadPoolExecutor(EXECUTOR_CORE_POOL_SIZE, EXECUTOR_CORE_POOL_SIZE,
+                    1L, TimeUnit.MILLISECONDS, synchronousQueue);
+        }
     }
 }

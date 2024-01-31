@@ -4,21 +4,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class ExecutorTrackingService {
-    private final List<ScheduledExecutorService> scheduledExecutorServiceList;
+    private final List<ThreadPoolExecutor> threadPoolExecutorList;
 
     public ExecutorTrackingService() {
-        this.scheduledExecutorServiceList = new ArrayList<>();
+        this.threadPoolExecutorList = new ArrayList<>();
     }
-    public void register(ScheduledExecutorService scheduledExecutorService) {
-        scheduledExecutorServiceList.add(scheduledExecutorService);
+    public void register(Executor executor) {
+        if (executor instanceof ThreadPoolExecutor) {
+            threadPoolExecutorList.add((ThreadPoolExecutor) executor);
+        }
     }
     public void shutdownAll() {
-        scheduledExecutorServiceList.forEach(scheduledExecutorService -> {
+        threadPoolExecutorList.forEach(scheduledExecutorService -> {
             System.out.println("Shutting down " + scheduledExecutorService + " in ExecutorsTrackingService.");
             scheduledExecutorService.shutdown();
             try {
@@ -30,6 +33,6 @@ public class ExecutorTrackingService {
                 System.out.println("Producer: " + Thread.currentThread().getName() + " interrupted.");
             }
         });
-        scheduledExecutorServiceList.clear();
+        threadPoolExecutorList.clear();
     }
 }
