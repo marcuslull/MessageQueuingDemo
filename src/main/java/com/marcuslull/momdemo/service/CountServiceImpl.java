@@ -13,29 +13,28 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CountServiceImpl implements CountService {
     private final RabbitTemplate rabbitTemplate;
-    private ScheduledExecutorService scheduledExecutorService;
     private final ExecutorTrackingService executorTrackingService;
     private final ViewModel viewModel;
-    private final int EXECUTOR_CORE_POOL_SIZE = 1;
-    private List<String> resources = List.of("Water", "Food", "Work", "Education", "Stone", "Wood", "Energy");
-    private long water;
-    private long food;
-    private long work;
-    private long education;
-    private long stone;
-    private long wood;
-    private long energy;
+    private final List<String> resources = List.of("Water", "Food", "Work", "Education", "Stone", "Wood", "Energy");
+    private Long water;
+    private Long food;
+    private Long work;
+    private Long education;
+    private Long stone;
+    private Long wood;
+    private Long energy;
 
     public CountServiceImpl(RabbitTemplate rabbitTemplate, ExecutorTrackingService executorTrackingService, ViewModel viewModel) {
         this.rabbitTemplate = rabbitTemplate;
         this.executorTrackingService = executorTrackingService;
         this.viewModel = viewModel;
     }
-
     @Override
     public Count getCount() {
+        // we need to update the UI with the current counts of each resource
         for (String resource : resources) {
-            long count = rabbitTemplate.execute(channel -> channel.messageCount(resource));
+            // check each queue for the number of messages
+            Long count = rabbitTemplate.execute(channel -> channel.messageCount(resource));
             switch (resource) {
                 case "Water" -> water = count;
                 case "Food" -> food = count;
@@ -49,14 +48,15 @@ public class CountServiceImpl implements CountService {
         return new Count(String.valueOf(water), String.valueOf(food), String.valueOf(work),
                 String.valueOf(education), String.valueOf(stone), String.valueOf(wood), String.valueOf(energy));
     }
-
     @Override
     public void monitorCount() {
-        scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
+        // we need to monitor the count of each resource and update the UI with the current counts
+        int EXECUTOR_CORE_POOL_SIZE = 1;
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
         Runnable runnable = () -> {
             viewModel.setCounts(getCount());
         };
         scheduledExecutorService.scheduleWithFixedDelay(runnable, 0, 1, TimeUnit.SECONDS);
-        executorTrackingService.register(scheduledExecutorService);
+        executorTrackingService.register(scheduledExecutorService); // keep track of the executor service
     }
 }

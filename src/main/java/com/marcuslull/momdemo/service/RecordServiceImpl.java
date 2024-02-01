@@ -102,23 +102,39 @@ public class RecordServiceImpl implements RecordService {
             "on the canvas of progress, a whispered song woven into the fabric of civilization. " +
             "From tilling soil to shaping stars, each labor adds a verse to the chorus, a testament to the human " +
             "spirit's tireless hum.";
-    private final Map<String, Integer> waterRequirements = new HashMap<>();
-    private final Map<String, Integer> foodRequirements = Map.ofEntries(entry("Water", 2));
-    private final Map<String, Integer> workRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1));
-    private final Map<String, Integer> educationRequirements = Map.ofEntries(entry("Water", 1), entry("Food", 1), entry("Work", 10));
-    private final Map<String, Integer> stoneRequirements = Map.ofEntries(entry("Water", 3), entry("Food", 1), entry("Work", 3));
-    private final Map<String, Integer> woodRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1), entry("Work", 2));
-    private final Map<String, Integer> energyRequirements = Map.ofEntries(entry("Work", 1), entry("Wood", 1));
 
 
     public RecordServiceImpl() {
-        this.waterRecord = new ResourceRecord("Water", waterDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.EASY, waterRequirements);
-        this.foodRecord = new ResourceRecord("Food", foodDescription, TechLevel.TECH_LEVEL_1, Rarity.UNCOMMON, Production.MEDIUM, Difficulty.MEDIUM, foodRequirements);
-        this.workRecord = new ResourceRecord("Work", workDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM, workRequirements);
-        this.educationRecord = new ResourceRecord("Education", educationDescription, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.SLOW, Difficulty.HARD, educationRequirements);
-        this.stoneRecord = new ResourceRecord("Stone", stoneDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.MEDIUM, Difficulty.EASY, stoneRequirements);
-        this.woodRecord = new ResourceRecord("Wood", woodDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON, Production.FAST, Difficulty.MEDIUM, woodRequirements);
-        this.energyRecord = new ResourceRecord("Energy",energyDescription1, TechLevel.TECH_LEVEL_1, Rarity.RARE, Production.FAST, Difficulty.EASY, energyRequirements);
+        Map<String, Integer> waterRequirements = new HashMap<>();
+        this.waterRecord = new ResourceRecord("Water", waterDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON,
+                Production.FAST, Difficulty.EASY, waterRequirements);
+
+        Map<String, Integer> foodRequirements = Map.ofEntries(entry("Water", 2));
+        this.foodRecord = new ResourceRecord("Food", foodDescription, TechLevel.TECH_LEVEL_1, Rarity.UNCOMMON,
+                Production.MEDIUM, Difficulty.MEDIUM, foodRequirements);
+
+        Map<String, Integer> workRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1));
+        this.workRecord = new ResourceRecord("Work", workDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON,
+                Production.FAST, Difficulty.MEDIUM, workRequirements);
+
+        Map<String, Integer> educationRequirements = Map.ofEntries(entry("Water", 1), entry("Food", 1),
+                entry("Work", 10));
+        this.educationRecord = new ResourceRecord("Education", educationDescription, TechLevel.TECH_LEVEL_1,
+                Rarity.RARE, Production.SLOW, Difficulty.HARD, educationRequirements);
+
+        Map<String, Integer> stoneRequirements = Map.ofEntries(entry("Water", 3), entry("Food", 1),
+                entry("Work", 3));
+        this.stoneRecord = new ResourceRecord("Stone", stoneDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON,
+                Production.MEDIUM, Difficulty.EASY, stoneRequirements);
+
+        Map<String, Integer> woodRequirements = Map.ofEntries(entry("Water", 2), entry("Food", 1),
+                entry("Work", 2));
+        this.woodRecord = new ResourceRecord("Wood", woodDescription, TechLevel.TECH_LEVEL_1, Rarity.COMMON,
+                Production.FAST, Difficulty.MEDIUM, woodRequirements);
+
+        Map<String, Integer> energyRequirements = Map.ofEntries(entry("Work", 1), entry("Wood", 1));
+        this.energyRecord = new ResourceRecord("Energy",energyDescription1, TechLevel.TECH_LEVEL_1, Rarity.RARE,
+                Production.FAST, Difficulty.EASY, energyRequirements);
     }
     @Override
     public ResourceRecord getRecord(String name) {

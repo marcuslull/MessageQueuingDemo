@@ -17,16 +17,18 @@ public class ExecutorTrackingServiceImpl implements ExecutorTrackingService {
     }
     @Override
     public void register(Executor executor) {
+        // keep track of all the executors, so we can shut them down later if needed
         if (executor instanceof ThreadPoolExecutor) {
             threadPoolExecutorList.add((ThreadPoolExecutor) executor);
         }
     }
     @Override
     public void shutdownAll() {
+        // shut down all the executors gracefully when the stop button is pressed
         threadPoolExecutorList.forEach(scheduledExecutorService -> {
-            System.out.println("Shutting down " + scheduledExecutorService + " in ExecutorsTrackingService.");
             scheduledExecutorService.shutdown();
             try {
+                // kill it if it doesn't shut down gracefully
                 if(!scheduledExecutorService.awaitTermination(1, TimeUnit.SECONDS)) {
                     scheduledExecutorService.shutdownNow();
                 }
@@ -35,6 +37,6 @@ public class ExecutorTrackingServiceImpl implements ExecutorTrackingService {
                 System.out.println("Producer: " + Thread.currentThread().getName() + " interrupted.");
             }
         });
-        threadPoolExecutorList.clear();
+        threadPoolExecutorList.clear(); // clear the list, so we have an empty list for the next run
     }
 }

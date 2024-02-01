@@ -37,21 +37,21 @@ public class AssemblerServiceImpl implements AssemblerService {
     }
     @Override
     public void assemble(Resource output, int amount) {
-        initializeExecutor();
+        initializeExecutor(); // make sure we have a valid executor
         Runnable runnable = (() -> {
-            Map<String, Integer> requirements = output.getRequirements();
+            Map<String, Integer> requirements = output.getRequirements(); // K: resource name, V: amount
             for (int i = 0; i < amount; i++) {
                 // secure the resources needed for the output
-                List<Future> listOfFutures = new ArrayList<>();
+                List<Future<List<Resource>>> listOfFutures = new ArrayList<>();
                 for (Map.Entry<String, Integer> entry : requirements.entrySet()) {
                     Resource resource = new Resource(recordService.getRecord(entry.getKey()));
-                    listOfFutures.add(consumerService.consume(resource, entry.getValue()));
+                    listOfFutures.add(consumerService.consume(resource, entry.getValue())); // fetching the resources
                 }
                 // wait for the resources to be secured and then discard them simulating use
-                for (Future future : listOfFutures) {
+                for (Future<List<Resource>> future : listOfFutures) {
                     try {
-                        List<Resource> listOfResources = (List<Resource>) future.get();
-                        listOfResources.clear();
+                        List<Resource> listOfResources = future.get();
+                        listOfResources.clear(); // discard the resources
                     } catch (Exception e) {
                         System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
                     }
@@ -59,7 +59,7 @@ public class AssemblerServiceImpl implements AssemblerService {
                 try {
                     // block the thread for the production time and then produce the output
                     sleep(output.getProductionTime() * 1000L);
-                    producerService.produce(output, 1);
+                    producerService.produce(output, 1); // send the output to the appropriate message queue
                 } catch (InterruptedException e) {
                     System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
                 }
@@ -67,15 +67,17 @@ public class AssemblerServiceImpl implements AssemblerService {
         });
         threadPoolExecutor.allowCoreThreadTimeOut(true); // timeout idle threads otherwise it messes up the focus count
         threadPoolExecutor.submit(runnable);
-        executorTrackingService.register(threadPoolExecutor);
+        executorTrackingService.register(threadPoolExecutor); // register the executor for tracking and proper shutdown
     }
     @Override
     public void updateViewModel() {
+        // gives an accurate count of available threads which are called focus in the view model and UI
+        // This is why idle threads need to be timed out asap
         viewModel.setFocus(threadPoolExecutor.getCorePoolSize() - threadPoolExecutor.getActiveCount());
     }
     @Override
     public void initializeExecutor() {
-        // if the stop button is pressed and the executor is terminated, create a new one
+        // if the stop button is pressed and the constructor initialized executor is terminated, create a new one
         if (this.threadPoolExecutor.isTerminated()) {
             this.threadPoolExecutor = new ThreadPoolExecutor(EXECUTOR_CORE_POOL_SIZE, EXECUTOR_CORE_POOL_SIZE,
                     1L, TimeUnit.MILLISECONDS, synchronousQueue);

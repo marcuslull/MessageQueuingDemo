@@ -28,7 +28,7 @@ public class Resource implements Serializable {
         this.techLevel = record.techLevel();
         this.requirements = record.requirements();
         this.productionTime = (this.difficulty.ordinal() * this.rarity.ordinal() * this.production.ordinal() *
-                this.techLevel.ordinal());
+                this.techLevel.ordinal()); // this is overall creation time in seconds
     }
 
     public String getName() {

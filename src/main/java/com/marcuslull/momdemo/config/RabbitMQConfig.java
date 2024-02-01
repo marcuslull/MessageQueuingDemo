@@ -8,12 +8,12 @@ import java.util.List;
 
 @Configuration
 public class RabbitMQConfig {
-    private final String PACKAGE_NAME = "*"; // TODO: specify the package name
 
     @Bean
     public SimpleMessageConverter converter() {
         SimpleMessageConverter converter = new SimpleMessageConverter();
-        converter.setAllowedListPatterns(List.of(PACKAGE_NAME));
+        String PACKAGE_NAME = "*";
+        converter.setAllowedListPatterns(List.of(PACKAGE_NAME)); // required by RabbitMQ as a security measure
         return converter;
     }
 }

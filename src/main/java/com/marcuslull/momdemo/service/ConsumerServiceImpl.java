@@ -21,16 +21,18 @@ public class ConsumerServiceImpl implements ConsumerService {
 
     @Override
     public Future<List<Resource>> consume(Resource resource, int amount) {
-        // TODO: Implement cleanup and escrow to implement a transactional system
+        // Gather resources from the message queue and return them as a list for the assembler to use
         return CompletableFuture.supplyAsync(() -> {
             List<Resource> resources = new ArrayList<>();
             while (resources.size() < amount) {
+                // grab the message from the given queue
                 Message message = rabbitTemplate.receive(resource.getName());
-                if (message != null) {
+                if (message != null) { // make sure it is an actual message and convert it to a resource
                     resources.add((Resource) rabbitTemplate.getMessageConverter().fromMessage(message));
                 } else {
+                    // if there is no message, wait a bit and try again
                     try {
-                        Thread.sleep(RESOURCE_CONSUMPTION_ATTEMPT_INTERVAL);
+                        Thread.sleep(RESOURCE_CONSUMPTION_ATTEMPT_INTERVAL); // blocking is intentional to preserve realism
                     } catch (InterruptedException e) {
                         e.printStackTrace(); // TODO: Handle this exception
                     }

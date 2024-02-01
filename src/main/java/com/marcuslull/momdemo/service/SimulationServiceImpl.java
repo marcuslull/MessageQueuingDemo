@@ -19,14 +19,9 @@ public class SimulationServiceImpl implements SimulationService {
     private final ProducerService producerService;
     private TechLevel currentTechLevel;
     private Resource water;
-    private Resource food;
-    private Resource work;
-    private Resource education;
-    private Resource stone;
-    private Resource wood;
-    private Resource energy;
 
-    public SimulationServiceImpl(RabbitTemplate rabbitTemplate, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, CountService countService, ProducerService producerService) {
+    public SimulationServiceImpl(RabbitTemplate rabbitTemplate, ViewModel viewModel, RecordService recordService,
+                                 AssemblerService assemblerService, CountService countService, ProducerService producerService) {
         this.rabbitTemplate = rabbitTemplate;
         this.viewModel = viewModel;
         this.recordService = recordService;
@@ -36,39 +31,45 @@ public class SimulationServiceImpl implements SimulationService {
     }
     @Override
     public void init() {
+        // creates the base resources and sends them to the view model using authoritative records
         ResourceRecord waterRecord = recordService.getRecord("Water");
         water = new Resource(waterRecord);
         viewModel.setResources(water);
+
         ResourceRecord foodRecord = recordService.getRecord("Food");
-        food = new Resource(foodRecord);
+        Resource food = new Resource(foodRecord);
         viewModel.setResources(food);
+
         ResourceRecord workRecord = recordService.getRecord("Work");
-        work = new Resource(workRecord);
+        Resource work = new Resource(workRecord);
         viewModel.setResources(work);
+
         ResourceRecord educationRecord = recordService.getRecord("Education");
-        education = new Resource(educationRecord);
+        Resource education = new Resource(educationRecord);
         viewModel.setResources(education);
+
         ResourceRecord stoneRecord = recordService.getRecord("Stone");
-        stone = new Resource(stoneRecord);
+        Resource stone = new Resource(stoneRecord);
         viewModel.setResources(stone);
+
         ResourceRecord woodRecord = recordService.getRecord("Wood");
-        wood = new Resource(woodRecord);
+        Resource wood = new Resource(woodRecord);
         viewModel.setResources(wood);
+
         ResourceRecord energyRecord = recordService.getRecord("Energy");
-        energy = new Resource(energyRecord);
+        Resource energy = new Resource(energyRecord);
         viewModel.setResources(energy);
     }
     @Override
     public void start() throws ExecutionException, InterruptedException {
-        countService.monitorCount();
-        assemblerService.updateViewModel();
-        setCurrentTechLevel(TechLevel.TECH_LEVEL_1);
-        producerService.autoProduce(water);
-
-        //assemblerService.assemble(food, 10);
+        countService.monitorCount(); // starting count monitor which checks resource counts every 1 second and updates the view model
+        assemblerService.updateViewModel(); // get the initial thread count (as focus) and updates the view model
+        setCurrentTechLevel(TechLevel.TECH_LEVEL_1); // set the initial tech level and update the view model
+        producerService.autoProduce(water); // start producing water which is the base free resource
     }
     @Override
     public void reset() {
+        // purges all the queues and resets the tech level
         rabbitTemplate.execute(channel -> {
             channel.queuePurge("Water");
             channel.queuePurge("Food");
@@ -83,6 +84,7 @@ public class SimulationServiceImpl implements SimulationService {
     }
     @Override
     public void setCurrentTechLevel(TechLevel newTechLevel) {
+        // Updates the view model with the new tech level
         this.currentTechLevel = newTechLevel;
         switch (newTechLevel) {
             case TECH_LEVEL_1 -> viewModel.setTechLabel("1");
@@ -92,5 +94,8 @@ public class SimulationServiceImpl implements SimulationService {
         }
     }
     @Override
-    public void advanceTechLevel() { setCurrentTechLevel(TechLevel.values()[currentTechLevel.ordinal() + 1]); }
+    public void advanceTechLevel() {
+        // Tech levels are not currently implemented, but this method is here for future use
+        setCurrentTechLevel(TechLevel.values()[currentTechLevel.ordinal() + 1]);
+    }
 }

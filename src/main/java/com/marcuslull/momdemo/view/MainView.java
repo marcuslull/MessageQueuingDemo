@@ -23,113 +23,84 @@ import java.util.concurrent.TimeUnit;
 @Route
 @PageTitle("Message queueing demo")
 public class MainView extends VerticalLayout {
-    private final SimulationService simulationService;
-    private final ViewModel viewModel;
-    private final RecordService recordService;
-    private final AssemblerService assemblerService;
     private ScheduledExecutorService scheduledExecutorService;
-    private final ExecutorTrackingService executorTrackingService;
-    private final CountService countService;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
-    private final H2 titleH1 = new H2("Message queueing and Threading demo.");
-    private final HorizontalLayout startStopButtonLayout = new HorizontalLayout();
     private final Button startButton = new Button("Start");
     private final Button stopButton = new Button("Stop");
     private final Button resetButton = new Button("Reset");
-    private final HorizontalLayout statusLayout = new HorizontalLayout();
     private final Label techLabel = new Label();
     private final Label focusLabel = new Label();
-    private final Label countGridLabel = new Label("Available resources");
     private final Grid<Count> countGrid = new Grid<>(Count.class);
-    private List<Count> counts;
-    private final Grid<Resource> resourceGrid = new Grid<>(Resource.class);
     private final HorizontalLayout createButtonLayout = new HorizontalLayout();
-    private final Button foodButton = new Button("Produce food");
-    private final Button workButton = new Button("Produce work");
-    private final Button educationButton = new Button("Produce education");
-    private final Button stoneButton = new Button("Produce stone");
-    private final Button woodButton = new Button("Produce wood");
-    private final Button energyButton = new Button("Produce energy");
-    private final List<Resource> resources;
-    private final Label resourceGridLabel = new Label("Resource information");
-    private final Label techLevelLabel = new Label("Unlock more resources by increasing the tech level.");
 
     public MainView(SimulationService simulationService, ViewModel viewModel, RecordService recordService, AssemblerService assemblerService, ExecutorTrackingService executorTrackingService, CountService countService) {
-        this.simulationService = simulationService;
-        this.viewModel = viewModel;
-        this.recordService = recordService;
-        this.assemblerService = assemblerService;
-        this.executorTrackingService = executorTrackingService;
-        this.countService = countService;
-        this.simulationService.init();
+
+        // Initialize the backend
+        simulationService.init();
+
+        // UI Components
+        HorizontalLayout startStopButtonLayout = new HorizontalLayout();
+        HorizontalLayout statusLayout = new HorizontalLayout();
+        Button foodButton = new Button("Produce food");
+        Button workButton = new Button("Produce work");
+        Button educationButton = new Button("Produce education");
+        Button stoneButton = new Button("Produce stone");
+        Button woodButton = new Button("Produce wood");
+        Button energyButton = new Button("Produce energy");
+        Grid<Resource> resourceGrid = new Grid<>(Resource.class);
         this.stopButton.setEnabled(false);
-        this.startStopButtonLayout.add(startButton, stopButton, resetButton);
+        startStopButtonLayout.add(startButton, stopButton, resetButton);
         this.techLabel.setText("Tech level: " + viewModel.getTechLabel());
         this.focusLabel.setText("Available focus: " + viewModel.getFocus());
-        this.statusLayout.setWidth("100%");
-        this.statusLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
-        this.statusLayout.add(techLabel, focusLabel);
-        this.counts = viewModel.getCounts();
+        statusLayout.setWidth("100%");
+        statusLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
+        statusLayout.add(techLabel, focusLabel);
+        List<Count> counts = viewModel.getCounts();
         this.countGrid.setItems(counts);
         this.countGrid.setColumns("water", "food", "work", "education", "stone", "wood", "energy");
         this.countGrid.setHeight("100px");
         this.createButtonLayout.setWidth("100%");
         this.createButtonLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
-        this.foodButton.setEnabled(false);
-        this.workButton.setEnabled(false);
-        this.educationButton.setEnabled(false);
-        this.stoneButton.setEnabled(false);
-        this.woodButton.setEnabled(false);
-        this.energyButton.setEnabled(false);
+        foodButton.setEnabled(false);
+        workButton.setEnabled(false);
+        educationButton.setEnabled(false);
+        stoneButton.setEnabled(false);
+        woodButton.setEnabled(false);
+        energyButton.setEnabled(false);
         this.createButtonLayout.add(foodButton, workButton, educationButton, stoneButton, woodButton, energyButton);
-        this.resources = viewModel.getResources();
-        this.resourceGrid.setItems(resources);
-        this.resourceGrid.setColumns("name", "description", "rarity", "difficulty", "production", "techLevel", "requirements", "productionTime");
-        this.resourceGrid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-        this.resourceGrid.setHeight("1000px");
-        this.resourceGrid.getColumnByKey("description").setFlexGrow(8);
-        this.resourceGrid.getColumnByKey("requirements").setFlexGrow(4);
+        List<Resource> resources = viewModel.getResources();
+        resourceGrid.setItems(resources);
+        resourceGrid.setColumns("name", "description", "rarity", "difficulty", "production", "techLevel", "requirements", "productionTime");
+        resourceGrid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
+        resourceGrid.setHeight("1000px");
+        resourceGrid.getColumnByKey("description").setFlexGrow(8);
+        resourceGrid.getColumnByKey("requirements").setFlexGrow(4);
 
+        // Layout
         setMargin(true);
         setWidth("98%");
+        H2 titleH1 = new H2("Message queueing and Threading demo.");
+        Label countGridLabel = new Label("Available resources");
+        Label resourceGridLabel = new Label("Resource information");
+        Label techLevelLabel = new Label("Unlock more resources by increasing the tech level. ***NYI***");
         add(titleH1, startStopButtonLayout, statusLayout, countGridLabel, countGrid, createButtonLayout, resourceGridLabel, resourceGrid, techLevelLabel);
 
-        // Listeners
+        // Button listeners
         startButton.addClickListener(e -> {
             try {
-                simulationService.start();
+                simulationService.start(); // start the simulation
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);
                 resetButton.setEnabled(false);
-                createButtonLayout.getChildren().forEach(button -> {
-                    button.getElement().setEnabled(true);
-                });
+                createButtonLayout.getChildren().forEach(button -> button.getElement().setEnabled(true)); // add buttons for available resources
             } catch (ExecutionException | InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-
+            // Start the UI update thread. Loops every 200ms and updates the UI.
             scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
-            UI ui = UI.getCurrent();
-            Runnable runnable = () -> {
-                ui.access(() -> {
-                    countGrid.setItems(viewModel.getCounts());
-                    techLabel.setText("Tech level: " + viewModel.getTechLabel());
-                    assemblerService.updateViewModel();
-                    if (viewModel.getFocus() == 0) {
-                        createButtonLayout.getChildren().forEach(button -> {
-                            button.getElement().setEnabled(false);
-                        });
-                    } else {
-                        createButtonLayout.getChildren().forEach(button -> {
-                            button.getElement().setEnabled(true);
-                        });
-                    }
-                    focusLabel.setText("Available focus: " + viewModel.getFocus());
-                    ui.push();
-                });
-            };
+            Runnable runnable = getRunnable(viewModel, assemblerService);
             scheduledExecutorService.scheduleWithFixedDelay(runnable, 200, 200, TimeUnit.MILLISECONDS);
-            executorTrackingService.register(scheduledExecutorService);
+            executorTrackingService.register(scheduledExecutorService); // register the executor to be able to shut it down later
         });
 
         stopButton.addClickListener(e -> {
@@ -139,23 +110,50 @@ public class MainView extends VerticalLayout {
             createButtonLayout.getChildren().forEach(button -> {
                 button.getElement().setEnabled(false);
             });
+            // shuts down all thread executors effectively pausing the simulation
             executorTrackingService.shutdownAll();
         });
 
         resetButton.addClickListener(e -> {
             startButton.setEnabled(true);
             stopButton.setEnabled(false);
-            simulationService.reset();
+            simulationService.reset(); // reset the simulation, purging all message queues
             viewModel.getCounts().clear();
             countGrid.setItems(viewModel.getCounts());
         });
 
         createButtonLayout.getChildren().forEach(button -> {
-            button.getElement()
-                    .addEventListener("click", event -> {
-                        assemblerService.assemble(new Resource(recordService.getRecord(
-                                button.getElement().getText().substring(8))), 1);
+            button.getElement().addEventListener("click", event -> {
+                // Assemble the resource according to the button pushed by parsing the button text to get the resource name
+                assemblerService.assemble(new Resource(recordService.getRecord(button.getElement().getText()
+                        .substring(8))), 1);
             });
         });
+    }
+
+    // Private helper methods
+    private Runnable getRunnable(ViewModel viewModel, AssemblerService assemblerService) {
+        // Vaadin requires the UI be updated from the UI thread. This Runnable is used to update the UI.
+        // The Runnable is scheduled to run every 200ms.
+        UI ui = UI.getCurrent();
+        return () -> {
+            ui.access(() -> { // the Vaadin entry point to update the UI. End with ui.push() to push the changes to the UI
+                countGrid.setItems(viewModel.getCounts()); // update the count grid
+                techLabel.setText("Tech level: " + viewModel.getTechLabel()); // update the tech level
+                assemblerService.updateViewModel(); // update the focus count (available threads in the thread pool)
+                // disable/enable all create according to focus availability
+                if (viewModel.getFocus() == 0) {
+                    createButtonLayout.getChildren().forEach(button -> {
+                        button.getElement().setEnabled(false);
+                    });
+                } else {
+                    createButtonLayout.getChildren().forEach(button -> {
+                        button.getElement().setEnabled(true);
+                    });
+                }
+                focusLabel.setText("Available focus: " + viewModel.getFocus()); // update the focus label
+                ui.push(); // push the changes to the UI
+            });
+        };
     }
 }

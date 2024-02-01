@@ -11,10 +11,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class ProducerServiceImpl implements ProducerService {
     private final RabbitTemplate rabbitTemplate;
-    private ScheduledExecutorService scheduledExecutorService;
     private final ExecutorTrackingService executorTrackingService;
-    private final Long MILLIS_PER_SECOND = 1000L;
-    private final int EXECUTOR_CORE_POOL_SIZE = 1;
 
     public ProducerServiceImpl(RabbitTemplate rabbitTemplate, ExecutorTrackingService executorTrackingService) {
         this.rabbitTemplate = rabbitTemplate;
@@ -22,17 +19,21 @@ public class ProducerServiceImpl implements ProducerService {
     }
     @Override
     public void autoProduce(Resource resource) {
-        scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
+        // This is for water - it is freely produced in its own thread that does not count against focus (thread pool)
+        int EXECUTOR_CORE_POOL_SIZE = 1;
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
         Runnable runnable = () -> {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
         };
+        long MILLIS_PER_SECOND = 1000L;
         scheduledExecutorService.scheduleWithFixedDelay(runnable, resource.getProductionTime() * MILLIS_PER_SECOND,
                 resource.getProductionTime() * MILLIS_PER_SECOND, TimeUnit.MILLISECONDS);
-        executorTrackingService.register(scheduledExecutorService);
+        executorTrackingService.register(scheduledExecutorService); // keep track of the executor
     }
 
     @Override
     public void produce(Resource resource, int amount) {
+        // all other resources use this method to produce. Called by assembler and runs in the focus thread pool
         for (int i = 0; i < amount; i++) {
             rabbitTemplate.convertAndSend(resource.getName(), resource);
         }

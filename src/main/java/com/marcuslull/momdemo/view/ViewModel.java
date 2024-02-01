@@ -12,7 +12,6 @@ public class ViewModel {
     private String techLabel = "0";
     private final List<Count> counts = new ArrayList<>();
     private final List<Resource> resources = new ArrayList<>();
-    private List<Boolean> buttonStates = new ArrayList<>();
     private int focus = 0;
 
     public ViewModel() {
@@ -41,14 +40,6 @@ public class ViewModel {
 
     public void setResources(Resource resource) {
         this.resources.add(resource);
-    }
-
-    public List<Boolean> getButtonStates() {
-        return buttonStates;
-    }
-
-    public void setButtonStates(List<Boolean> buttonStates) {
-        this.buttonStates = buttonStates;
     }
 
     public int getFocus() {
