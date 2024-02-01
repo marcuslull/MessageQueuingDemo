@@ -6,18 +6,16 @@ import com.marcuslull.momdemo.view.ViewModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -66,10 +64,30 @@ class AssemblerServiceImplTest {
     }
 
     @Test
-    void initializeExecutor() {
-        ExecutorService threadPoolExecutor = mock(ExecutorService.class);
-        when(threadPoolExecutor.isTerminated()).thenReturn(true);
+    void initializeExecutor() throws NoSuchFieldException, IllegalAccessException {
+
+        // Create a real ThreadPoolExecutor with a single thread pool size
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1,
+                0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
+        // Check the number of active threads and terminate before calling initializeExecutor()
+        int poolSizeBefore = threadPoolExecutor.getCorePoolSize();
+        threadPoolExecutor.shutdownNow();
+
+        // Use reflection to set the ThreadPoolExecutor in assemblerService
+        Field field = AssemblerServiceImpl.class.getDeclaredField("threadPoolExecutor");
+        field.setAccessible(true);
+        field.set(assemblerService, threadPoolExecutor);
+
+        // This should trigger the creation of a new ThreadPoolExecutor because the current one is terminated
         assemblerService.initializeExecutor();
-        verify(threadPoolExecutor, atLeastOnce());
+
+        // Check the number of active threads after calling initializeExecutor() - should be 10
+        ThreadPoolExecutor newThreadPoolExecutor = (ThreadPoolExecutor) field.get(assemblerService);
+        int poolSizeAfter = newThreadPoolExecutor.getCorePoolSize();
+
+        // Verify that a new ThreadPoolExecutor was created/
+        assertEquals(1, poolSizeBefore);
+        assertEquals(10, poolSizeAfter);
     }
 }
