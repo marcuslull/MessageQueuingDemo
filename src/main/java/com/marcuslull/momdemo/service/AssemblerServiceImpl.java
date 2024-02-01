@@ -25,7 +25,9 @@ public class AssemblerServiceImpl implements AssemblerService {
     public static final int EXECUTOR_CORE_POOL_SIZE = 10;
     private final ExecutorTrackingService executorTrackingService;
 
-    public AssemblerServiceImpl(ConsumerService consumerService, ProducerService producerService, RecordService recordService, ViewModel viewModel, ExecutorTrackingService executorTrackingService) {
+    public AssemblerServiceImpl(ConsumerService consumerService, ProducerService producerService,
+                                RecordService recordService, ViewModel viewModel,
+                                ExecutorTrackingService executorTrackingService) {
         this.consumerService = consumerService;
         this.producerService = producerService;
         this.recordService = recordService;
