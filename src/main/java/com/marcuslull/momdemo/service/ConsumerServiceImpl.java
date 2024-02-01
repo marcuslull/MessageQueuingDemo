@@ -34,7 +34,7 @@ public class ConsumerServiceImpl implements ConsumerService {
                     try {
                         Thread.sleep(RESOURCE_CONSUMPTION_ATTEMPT_INTERVAL); // blocking is intentional to preserve realism
                     } catch (InterruptedException e) {
-                        e.printStackTrace(); // TODO: Handle this exception
+                        // swallowing - the only interruption we expect is from the stop button which would be intentional
                     }
                 }
             }

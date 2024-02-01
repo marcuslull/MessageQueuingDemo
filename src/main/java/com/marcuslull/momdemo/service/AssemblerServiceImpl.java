@@ -53,7 +53,7 @@ public class AssemblerServiceImpl implements AssemblerService {
                         List<Resource> listOfResources = future.get();
                         listOfResources.clear(); // discard the resources
                     } catch (Exception e) {
-                        System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
+                        // swallowing these three exception possibilities - this data is all discarded anyway
                     }
                 }
                 try {
@@ -61,7 +61,7 @@ public class AssemblerServiceImpl implements AssemblerService {
                     sleep(output.getProductionTime() * 1000L);
                     producerService.produce(output, 1); // send the output to the appropriate message queue
                 } catch (InterruptedException e) {
-                    System.out.println("Assembler: " + Thread.currentThread().getName() + " interrupted.");
+                    // swallowing - the only interruption we expect is from the stop button which would be intentional
                 }
             }
         });

@@ -89,13 +89,14 @@ public class MainView extends VerticalLayout {
         startButton.addClickListener(e -> {
             try {
                 simulationService.start(); // start the simulation
-                startButton.setEnabled(false);
-                stopButton.setEnabled(true);
-                resetButton.setEnabled(false);
-                createButtonLayout.getChildren().forEach(button -> button.getElement().setEnabled(true)); // add buttons for available resources
             } catch (ExecutionException | InterruptedException ex) {
+                // This should be thrown if the simulation fails to start - something is fundamentally wrong
                 throw new RuntimeException(ex);
             }
+            startButton.setEnabled(false);
+            stopButton.setEnabled(true);
+            resetButton.setEnabled(false);
+            createButtonLayout.getChildren().forEach(button -> button.getElement().setEnabled(true)); // add buttons for available resources
             // Start the UI update thread. Loops every 200ms and updates the UI.
             scheduledExecutorService = Executors.newScheduledThreadPool(EXECUTOR_CORE_POOL_SIZE);
             Runnable runnable = getRunnable(viewModel, assemblerService);

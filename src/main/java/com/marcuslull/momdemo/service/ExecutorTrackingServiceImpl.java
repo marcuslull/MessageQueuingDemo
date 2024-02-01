@@ -33,8 +33,8 @@ public class ExecutorTrackingServiceImpl implements ExecutorTrackingService {
                     scheduledExecutorService.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                // TODO: Handle this properly
-                System.out.println("Producer: " + Thread.currentThread().getName() + " interrupted.");
+                // This is expected, so we can ignore it
+                System.out.println(Thread.currentThread().getName() + " interrupted.");
             }
         });
         threadPoolExecutorList.clear(); // clear the list, so we have an empty list for the next run
