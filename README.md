@@ -4,6 +4,7 @@
 * Spin-up a local docker container running the official RabbitMQ image
 * Expose the default ports for the connection and management
 * Create a secrets.properties file in the resources folder specifying RABBITMQ_USERNAME and RABBITMQ_PASSWORD
+* Create message queues - list found in src/main/java/com/marcuslull/momdemo/model/Count.java
 * Compile and run the application with your preferred IDE
 
 ## Description
