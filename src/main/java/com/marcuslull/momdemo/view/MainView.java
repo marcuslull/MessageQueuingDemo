@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Route
-@PageTitle("Message queueing demo")
+@PageTitle("Message Queueing Demo")
 public class MainView extends VerticalLayout {
     private ScheduledExecutorService scheduledExecutorService;
     private final int EXECUTOR_CORE_POOL_SIZE = 1;
@@ -39,8 +39,14 @@ public class MainView extends VerticalLayout {
         simulationService.init();
 
         // UI Components
+        H2 titleH1 = new H2("Message Queueing and Threading Demo");
+        Label aboutLabel = new Label("Learn about how this was created");
+        aboutLabel.getStyle().set("color", "blue");
+        aboutLabel.getStyle().set("textDecoration", "underline");
         HorizontalLayout startStopButtonLayout = new HorizontalLayout();
         HorizontalLayout statusLayout = new HorizontalLayout();
+        Label countGridLabel = new Label("Available resources");
+        countGridLabel.getStyle().set("fontWeight", "bold");
         Button foodButton = new Button("Produce food");
         Button workButton = new Button("Produce work");
         Button educationButton = new Button("Produce education");
@@ -51,7 +57,9 @@ public class MainView extends VerticalLayout {
         this.stopButton.setEnabled(false);
         startStopButtonLayout.add(startButton, stopButton, resetButton);
         this.techLabel.setText("Tech level: " + viewModel.getTechLabel());
+        this.techLabel.getStyle().set("fontWeight", "bold");
         this.focusLabel.setText("Available focus: " + viewModel.getFocus());
+        this.focusLabel.getStyle().set("fontWeight", "bold");
         statusLayout.setWidth("100%");
         statusLayout.setJustifyContentMode(JustifyContentMode.EVENLY);
         statusLayout.add(techLabel, focusLabel);
@@ -68,6 +76,8 @@ public class MainView extends VerticalLayout {
         woodButton.setEnabled(false);
         energyButton.setEnabled(false);
         this.createButtonLayout.add(foodButton, workButton, educationButton, stoneButton, woodButton, energyButton);
+        Label resourceGridLabel = new Label("Resource information");
+        resourceGridLabel.getStyle().set("fontWeight", "bold");
         List<Resource> resources = viewModel.getResources();
         resourceGrid.setItems(resources);
         resourceGrid.setColumns("name", "description", "rarity", "difficulty", "production", "techLevel", "requirements", "productionTime");
@@ -75,17 +85,17 @@ public class MainView extends VerticalLayout {
         resourceGrid.setHeight("1000px");
         resourceGrid.getColumnByKey("description").setFlexGrow(8);
         resourceGrid.getColumnByKey("requirements").setFlexGrow(4);
+        Label techLevelLabel = new Label("Unlock more resources by increasing the tech level. ***NYI***");
 
         // Layout
         setMargin(true);
         setWidth("98%");
-        H2 titleH1 = new H2("Message queueing and Threading demo.");
-        Label countGridLabel = new Label("Available resources");
-        Label resourceGridLabel = new Label("Resource information");
-        Label techLevelLabel = new Label("Unlock more resources by increasing the tech level. ***NYI***");
-        add(titleH1, startStopButtonLayout, statusLayout, countGridLabel, countGrid, createButtonLayout, resourceGridLabel, resourceGrid, techLevelLabel);
+        add(titleH1, aboutLabel, startStopButtonLayout, statusLayout, countGridLabel, countGrid, createButtonLayout, resourceGridLabel, resourceGrid, techLevelLabel);
 
         // Button listeners
+        aboutLabel.getElement().addEventListener("click", event ->
+                aboutLabel.getUI().ifPresent(ui -> ui.navigate("learn")));
+
         startButton.addClickListener(e -> {
             try {
                 simulationService.start(); // start the simulation

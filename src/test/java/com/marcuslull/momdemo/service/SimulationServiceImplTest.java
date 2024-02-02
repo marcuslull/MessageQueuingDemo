@@ -7,7 +7,6 @@ import com.marcuslull.momdemo.model.enums.Rarity;
 import com.marcuslull.momdemo.model.enums.TechLevel;
 import com.marcuslull.momdemo.model.records.ResourceRecord;
 import com.marcuslull.momdemo.view.ViewModel;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
