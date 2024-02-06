@@ -1,10 +1,11 @@
 # Message Queueing and Threading Demo
-A multithreading message queuing incremental game  
+A multithreading message queuing incremental game using Vaadin Flow  
 * Java (21)
 * Maven (3.9.5)
 * Spring Boot (parent 3.2.1)
   * starter AMQP
   * starter test
+* Vaadin Flow (24.0.0)
 
 ## Description
 This interactive demo represents a learning exercise designed to familiarize myself with the message oriented 
